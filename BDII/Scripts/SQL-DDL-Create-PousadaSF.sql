@@ -5,22 +5,22 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema PousaSaoFrancisco
+-- Schema PousadaAlambique
 -- -----------------------------------------------------
 -- Porjeto de banco de dados para o ensino da disciplina de Banco de Dados: DDL e DML.
 
 -- -----------------------------------------------------
--- Schema PousaSaoFrancisco
+-- Schema PousadaAlambique
 --
 -- Porjeto de banco de dados para o ensino da disciplina de Banco de Dados: DDL e DML.
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `PousaSaoFrancisco` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
-USE `PousaSaoFrancisco` ;
+CREATE SCHEMA IF NOT EXISTS `PousadaAlambique` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+USE `PousadaAlambique` ;
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Funcionario`
+-- Table `PousadaAlambique`.`Funcionario`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Funcionario` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Funcionario` (
   `CPF` VARCHAR(14) NOT NULL,
   `nome` VARCHAR(60) NOT NULL,
   `nomeSocial` VARCHAR(45) NULL,
@@ -42,9 +42,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Endereco`
+-- Table `PousadaAlambique`.`Endereco`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Endereco` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Endereco` (
   `Funcionario_CPF` VARCHAR(14) NOT NULL,
   `UF` CHAR(2) NOT NULL,
   `cidade` VARCHAR(45) NOT NULL,
@@ -57,16 +57,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Endereco` (
   PRIMARY KEY (`Funcionario_CPF`),
   CONSTRAINT `fk_Endereco_Fucnionario`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Telefone`
+-- Table `PousadaAlambique`.`Telefone`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Telefone` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Telefone` (
   `idTelefone` INT NOT NULL AUTO_INCREMENT,
   `numero` VARCHAR(15) NOT NULL,
   `Funcionario_CPF` VARCHAR(14) NOT NULL,
@@ -75,16 +75,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Telefone` (
   PRIMARY KEY (`idTelefone`),
   CONSTRAINT `fk_Telefone_Fucnionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Dependente`
+-- Table `PousadaAlambique`.`Dependente`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Dependente` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Dependente` (
   `CPF` VARCHAR(14) NOT NULL,
   `nome` VARCHAR(60) NOT NULL,
   `dataNasc` DATE NOT NULL,
@@ -94,16 +94,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Dependente` (
   INDEX `fk_Dependente_Fucnionario1_idx` (`Funcionario_CPF` ASC) VISIBLE,
   CONSTRAINT `fk_Dependente_Fucnionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`OcorrenciaInterna`
+-- Table `PousadaAlambique`.`OcorrenciaInterna`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`OcorrenciaInterna` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`OcorrenciaInterna` (
   `idOcorrenciaInterna` INT NOT NULL AUTO_INCREMENT,
   `gravidade` VARCHAR(15) NOT NULL,
   `dataHora` DATETIME NOT NULL,
@@ -113,16 +113,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`OcorrenciaInterna` (
   INDEX `fk_OcorrenciaInterna_Funcionario1_idx` (`Funcionario_CPF` ASC) VISIBLE,
   CONSTRAINT `fk_OcorrenciaInterna_Funcionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`RegistroPonto`
+-- Table `PousadaAlambique`.`RegistroPonto`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`RegistroPonto` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`RegistroPonto` (
   `idRegistroPonto` INT NOT NULL AUTO_INCREMENT,
   `dataHora` DATETIME NOT NULL,
   `tipoES` VARCHAR(15) NOT NULL,
@@ -132,16 +132,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`RegistroPonto` (
   INDEX `fk_RegistroPonto_Funcionario1_idx` (`Funcionario_CPF` ASC) VISIBLE,
   CONSTRAINT `fk_RegistroPonto_Funcionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Ferias`
+-- Table `PousadaAlambique`.`Ferias`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Ferias` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Ferias` (
   `idFerias` INT NOT NULL AUTO_INCREMENT,
   `anoRef` INT NOT NULL,
   `dataInicio` DATE NOT NULL,
@@ -153,16 +153,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Ferias` (
   INDEX `fk_Ferias_Funcionario1_idx` (`Funcionario_CPF` ASC) VISIBLE,
   CONSTRAINT `fk_Ferias_Funcionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Departamento`
+-- Table `PousadaAlambique`.`Departamento`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Departamento` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Departamento` (
   `idDepartamento` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(45) NOT NULL,
   `local` VARCHAR(45) NOT NULL,
@@ -172,16 +172,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Departamento` (
   INDEX `fk_Departamento_Funcionario1_idx` (`Gerente_CPF` ASC) VISIBLE,
   CONSTRAINT `fk_Departamento_Funcionario1`
     FOREIGN KEY (`Gerente_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Cargo`
+-- Table `PousadaAlambique`.`Cargo`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Cargo` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Cargo` (
   `CBO` INT NOT NULL,
   `nome` VARCHAR(45) NOT NULL,
   `faixaSalarial` VARCHAR(45) NOT NULL,
@@ -190,9 +190,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Trabalhar`
+-- Table `PousadaAlambique`.`Trabalhar`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Trabalhar` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Trabalhar` (
   `Funcionario_CPF` VARCHAR(14) NOT NULL,
   `Departamento_idDepartamento` INT NOT NULL,
   `Cargo_CBO` INT NOT NULL,
@@ -204,26 +204,26 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Trabalhar` (
   INDEX `fk_Trabalhar_Cargo1_idx` (`Cargo_CBO` ASC) VISIBLE,
   CONSTRAINT `fk_Funcionario_has_Departamento_Funcionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_Funcionario_has_Departamento_Departamento1`
     FOREIGN KEY (`Departamento_idDepartamento`)
-    REFERENCES `PousaSaoFrancisco`.`Departamento` (`idDepartamento`)
+    REFERENCES `PousadaAlambique`.`Departamento` (`idDepartamento`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Trabalhar_Cargo1`
     FOREIGN KEY (`Cargo_CBO`)
-    REFERENCES `PousaSaoFrancisco`.`Cargo` (`CBO`)
+    REFERENCES `PousadaAlambique`.`Cargo` (`CBO`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Hospede`
+-- Table `PousadaAlambique`.`Hospede`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospede` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Hospede` (
   `docIdentificacao` VARCHAR(25) NOT NULL,
   `nome` VARCHAR(45) NOT NULL,
   `genero` VARCHAR(25) NOT NULL,
@@ -235,16 +235,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospede` (
   INDEX `fk_Hospede_Hospede1_idx` (`Responsavel_docIdentificacao` ASC) VISIBLE,
   CONSTRAINT `fk_Hospede_Hospede1`
     FOREIGN KEY (`Responsavel_docIdentificacao`)
-    REFERENCES `PousaSaoFrancisco`.`Hospede` (`docIdentificacao`)
+    REFERENCES `PousadaAlambique`.`Hospede` (`docIdentificacao`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Reserva`
+-- Table `PousadaAlambique`.`Reserva`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Reserva` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Reserva` (
   `idReserva` INT NOT NULL AUTO_INCREMENT,
   `dataInicio` DATETIME NOT NULL,
   `dataFim` DATETIME NOT NULL,
@@ -257,21 +257,21 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Reserva` (
   INDEX `fk_Reserva_Hospede1_idx` (`Responsavel_docIdentificacao` ASC) VISIBLE,
   CONSTRAINT `fk_Reserva_Funcionario1`
     FOREIGN KEY (`Funcionario_CPF`)
-    REFERENCES `PousaSaoFrancisco`.`Funcionario` (`CPF`)
+    REFERENCES `PousadaAlambique`.`Funcionario` (`CPF`)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   CONSTRAINT `fk_Reserva_Hospede1`
     FOREIGN KEY (`Responsavel_docIdentificacao`)
-    REFERENCES `PousaSaoFrancisco`.`Hospede` (`docIdentificacao`)
+    REFERENCES `PousadaAlambique`.`Hospede` (`docIdentificacao`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`TipoUH`
+-- Table `PousadaAlambique`.`TipoUH`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`TipoUH` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`TipoUH` (
   `idTipoUH` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(25) NOT NULL,
   PRIMARY KEY (`idTipoUH`))
@@ -279,9 +279,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`UH`
+-- Table `PousadaAlambique`.`UH`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`UH` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`UH` (
   `idUH` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(25) NOT NULL,
   `local` VARCHAR(25) NOT NULL,
@@ -291,16 +291,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`UH` (
   INDEX `fk_UH_TipoUH1_idx` (`TipoUH_idTipoUH` ASC) VISIBLE,
   CONSTRAINT `fk_UH_TipoUH1`
     FOREIGN KEY (`TipoUH_idTipoUH`)
-    REFERENCES `PousaSaoFrancisco`.`TipoUH` (`idTipoUH`)
+    REFERENCES `PousadaAlambique`.`TipoUH` (`idTipoUH`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`UH_Reserva`
+-- Table `PousadaAlambique`.`UH_Reserva`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`UH_Reserva` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`UH_Reserva` (
   `UH_idUH` INT NOT NULL,
   `Reserva_idReserva` INT NOT NULL,
   PRIMARY KEY (`UH_idUH`, `Reserva_idReserva`),
@@ -308,21 +308,21 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`UH_Reserva` (
   INDEX `fk_UH_has_Reserva_UH1_idx` (`UH_idUH` ASC) VISIBLE,
   CONSTRAINT `fk_UH_has_Reserva_UH1`
     FOREIGN KEY (`UH_idUH`)
-    REFERENCES `PousaSaoFrancisco`.`UH` (`idUH`)
+    REFERENCES `PousadaAlambique`.`UH` (`idUH`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_UH_has_Reserva_Reserva1`
     FOREIGN KEY (`Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Reserva` (`idReserva`)
+    REFERENCES `PousadaAlambique`.`Reserva` (`idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Hospedagem`
+-- Table `PousadaAlambique`.`Hospedagem`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospedagem` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Hospedagem` (
   `Reserva_idReserva` INT NOT NULL,
   `checkIn` DATETIME NOT NULL,
   `chekOut` DATETIME NULL,
@@ -331,16 +331,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospedagem` (
   PRIMARY KEY (`Reserva_idReserva`),
   CONSTRAINT `fk_Hospedagem_Reserva1`
     FOREIGN KEY (`Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Reserva` (`idReserva`)
+    REFERENCES `PousadaAlambique`.`Reserva` (`idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Hospedar`
+-- Table `PousadaAlambique`.`Hospedar`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospedar` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Hospedar` (
   `Hospedagem_Reserva_idReserva` INT NOT NULL,
   `Hospede_docIdentificacao` VARCHAR(25) NOT NULL,
   PRIMARY KEY (`Hospedagem_Reserva_idReserva`, `Hospede_docIdentificacao`),
@@ -348,21 +348,21 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Hospedar` (
   INDEX `fk_Hospedagem_has_Hospede_Hospedagem1_idx` (`Hospedagem_Reserva_idReserva` ASC) VISIBLE,
   CONSTRAINT `fk_Hospedagem_has_Hospede_Hospedagem1`
     FOREIGN KEY (`Hospedagem_Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Hospedagem` (`Reserva_idReserva`)
+    REFERENCES `PousadaAlambique`.`Hospedagem` (`Reserva_idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Hospedagem_has_Hospede_Hospede1`
     FOREIGN KEY (`Hospede_docIdentificacao`)
-    REFERENCES `PousaSaoFrancisco`.`Hospede` (`docIdentificacao`)
+    REFERENCES `PousadaAlambique`.`Hospede` (`docIdentificacao`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Produto`
+-- Table `PousadaAlambique`.`Produto`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Produto` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Produto` (
   `idProduto` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(45) NOT NULL,
   `quantidade` INT NOT NULL,
@@ -373,9 +373,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`ItensHospedagem`
+-- Table `PousadaAlambique`.`ItensHospedagem`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`ItensHospedagem` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`ItensHospedagem` (
   `Hospedagem_Reserva_idReserva` INT NOT NULL,
   `Produto_idProduto` INT NOT NULL,
   `qtd` INT NOT NULL,
@@ -385,21 +385,21 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`ItensHospedagem` (
   INDEX `fk_Hospedagem_has_Produto_Hospedagem1_idx` (`Hospedagem_Reserva_idReserva` ASC) VISIBLE,
   CONSTRAINT `fk_Hospedagem_has_Produto_Hospedagem1`
     FOREIGN KEY (`Hospedagem_Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Hospedagem` (`Reserva_idReserva`)
+    REFERENCES `PousadaAlambique`.`Hospedagem` (`Reserva_idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Hospedagem_has_Produto_Produto1`
     FOREIGN KEY (`Produto_idProduto`)
-    REFERENCES `PousaSaoFrancisco`.`Produto` (`idProduto`)
+    REFERENCES `PousadaAlambique`.`Produto` (`idProduto`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`Ocorrencia`
+-- Table `PousadaAlambique`.`Ocorrencia`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Ocorrencia` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`Ocorrencia` (
   `idOcorrencia` INT NOT NULL AUTO_INCREMENT,
   `tipo` VARCHAR(45) NOT NULL,
   `obs` VARCHAR(250) NULL,
@@ -409,16 +409,16 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`Ocorrencia` (
   INDEX `fk_Ocorrencia_Hospedagem1_idx` (`Hospedagem_Reserva_idReserva` ASC) VISIBLE,
   CONSTRAINT `fk_Ocorrencia_Hospedagem1`
     FOREIGN KEY (`Hospedagem_Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Hospedagem` (`Reserva_idReserva`)
+    REFERENCES `PousadaAlambique`.`Hospedagem` (`Reserva_idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PousaSaoFrancisco`.`FormaPag`
+-- Table `PousadaAlambique`.`FormaPag`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`FormaPag` (
+CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`FormaPag` (
   `idFormaPag` INT NOT NULL AUTO_INCREMENT,
   `tipo` VARCHAR(25) NOT NULL,
   `valorPago` DECIMAL(7,2) UNSIGNED ZEROFILL NOT NULL,
@@ -428,7 +428,7 @@ CREATE TABLE IF NOT EXISTS `PousaSaoFrancisco`.`FormaPag` (
   INDEX `fk_FormaPag_Hospedagem1_idx` (`Hospedagem_Reserva_idReserva` ASC) VISIBLE,
   CONSTRAINT `fk_FormaPag_Hospedagem1`
     FOREIGN KEY (`Hospedagem_Reserva_idReserva`)
-    REFERENCES `PousaSaoFrancisco`.`Hospedagem` (`Reserva_idReserva`)
+    REFERENCES `PousadaAlambique`.`Hospedagem` (`Reserva_idReserva`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

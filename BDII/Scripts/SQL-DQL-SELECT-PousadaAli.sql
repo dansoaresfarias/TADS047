@@ -206,7 +206,12 @@ select fer.anoRef "Ano Referência",
     inner join funcionario func on func.cpf = fer.funcionario_cpf
 		order by fer.anoRef desc;
 
-
+select nome "Funcionário", 
+	replace(replace(cpf, '.', ''), '-', '') as "CPF", 
+    timestampdiff(year, func.dataNasc, now()) "Idade", 
+    concat(cargaHoraria, 'h') "Carga Horária", 
+    concat("R$ ", format(salario, 2, 'de_DE')) "Salário"
+	from funcionario
 
 
 

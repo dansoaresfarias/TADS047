@@ -208,10 +208,10 @@ select fer.anoRef "Ano Referência",
 
 select nome "Funcionário", 
 	replace(replace(cpf, '.', ''), '-', '') as "CPF", 
-    timestampdiff(year, func.dataNasc, now()) "Idade", 
+    timestampdiff(year, dataNasc, now()) "Idade", 
     concat(cargaHoraria, 'h') "Carga Horária", 
     concat("R$ ", format(salario, 2, 'de_DE')) "Salário"
-	from funcionario
+	from funcionario;
 
 
 

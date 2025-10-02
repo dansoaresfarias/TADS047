@@ -176,9 +176,12 @@ select func.nome "Funcionário", func.cpf "CPF",
     func.email "E-mail", 
     group_concat(
 		concat('(', substring(tel.numero, 1, 2), ')', substring(tel.numero, 3)) 
-			separator ', ') "Telefone"
+			separator ', ') "Telefone",
+	endc.cidade "Cidade", concat(func.cargaHoraria, 'h') "Carga Horária",
+    concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário"
 	from funcionario func
     inner join telefone tel on tel.funcionario_cpf = func.cpf
+    inner join endereco endc on endc.funcionario_cpf = func.cpf
 		group by func.cpf
 			order by func.nome;
 

@@ -170,5 +170,25 @@ select nome "Funcionário",
 			where cidade = "Recife" and bairro like "Boa%"
 				order by nome;
 
+-- funcionario, cpf, email, telefone, cidade, ch, salario ???
+select func.nome "Funcionário", func.cpf "CPF",
+	timestampdiff(year, func.dataNasc, now()) "Idade",
+    func.email "E-mail", 
+    group_concat(
+		concat('(', substring(tel.numero, 1, 2), ')', substring(tel.numero, 3)) 
+			separator ', ') "Telefone"
+	from funcionario func
+    inner join telefone tel on tel.funcionario_cpf = func.cpf
+		group by func.cpf
+			order by func.nome;
+
+
+
+
+
+
+
+
+
 
 

@@ -175,7 +175,8 @@ select func.nome "Funcionário", func.cpf "CPF",
 	timestampdiff(year, func.dataNasc, now()) "Idade",
     func.email "E-mail", 
     group_concat(
-		concat('(', substring(tel.numero, 1, 2), ')', substring(tel.numero, 3)) 
+		concat('(', substring(tel.numero, 1, 2), ')', substring(tel.numero, 3, 5), 
+			'-', substring(tel.numero, 8)) 
 			separator ', ') "Telefone",
 	endc.cidade "Cidade", concat(func.cargaHoraria, 'h') "Carga Horária",
     concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário"
@@ -184,6 +185,29 @@ select func.nome "Funcionário", func.cpf "CPF",
     inner join endereco endc on endc.funcionario_cpf = func.cpf
 		group by func.cpf
 			order by func.nome;
+
+select date_format(oi.dataHora, '%d/%m/%Y - %h:%i') "Data Ocorrência", 
+	oi.gravidade "Gravidade", 
+	oi.descricao "Descrição", func.nome "Funcionário"
+	from ocorrenciaInterna oi
+		inner join funcionario func on func.cpf = oi.funcionario_cpf
+			order by oi.dataHora desc;
+
+select fer.anoRef "Ano Referência",
+	date_format(fer.dataInicio, '%d/%m/%Y') "Data de Início",
+    date_format(
+		date_add(fer.dataInicio, interval fer.qtdDias day), '%d/%m/%Y'
+        ) "Data Fim", 
+    fer.qtdDias "Quantidade de Dias",
+    concat("R$ ", format(fer.valor, 2, 'de_DE')) "Valor",
+    upper(fer.`status`) "Situação",
+    func.nome "Funcionário"
+	from ferias fer
+    inner join funcionario func on func.cpf = fer.funcionario_cpf
+		order by fer.anoRef desc;
+
+
+
 
 
 

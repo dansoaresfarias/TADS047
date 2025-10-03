@@ -212,11 +212,12 @@ select func.nome "Funcionário",
     crg.nome "Cargo",
     concat(func.cargaHoraria, 'h') "Carga Horária", 
     concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário",
-    dpt.nome "Departamento", "Gerente"
+    dpt.nome "Departamento", grt.nome "Gerente"
 	from funcionario func
     inner join trabalhar trb on trb.funcionario_cpf = func.cpf
     inner join cargo crg on crg.cbo = trb.cargo_cbo
     inner join departamento dpt on dpt.idDepartamento = trb.Departamento_idDepartamento
+    left join funcionario grt on grt.cpf = dpt.gerente_cpf
 		where trb.dataFim is null
 			order by func.nome;
 

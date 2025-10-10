@@ -300,8 +300,16 @@ select func.nome "Funcionário", func.cpf "CPF", crg.nome "Cargo",
 			group by func.cpf, crg.CBO
 				order by func.nome;
                 
-
-
+select dep.nome "Departamento",
+	concat("R$ ", format(sum(func.salario), 2, 'de_DE')) "Custo Salarial",
+    count(func.cpf) "Quantidade de Funcionário",
+    concat("R$ ", format(avg(func.salario), 2, 'de_DE')) "Média Salarial"
+	from departamento dep
+    left join trabalhar trb on trb.Departamento_idDepartamento = dep.idDepartamento
+    inner join funcionario func on func.CPF = trb.Funcionario_CPF
+		where trb.dataFim is null
+			group by dep.idDepartamento
+				order by sum(func.salario) desc;
 
 
 

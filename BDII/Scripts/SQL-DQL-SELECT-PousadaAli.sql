@@ -221,6 +221,92 @@ select func.nome "Funcionário",
 		where trb.dataFim is null
 			order by func.nome;
 
+-- Funcionario, cpf, cargo, cargahoraria, chavePix, auxCreche, salario, telefone
+select func.nome "Funcionário", func.cpf "CPF", crg.nome "Cargo",
+	concat(func.cargaHoraria, 'h') "Carga Horária", func.chavePIX "Chave PIX",
+    "Auxílio Creche", -- 180 por filho menor que 7 anos
+    concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário",
+    group_concat(tel.numero separator ', ') "Telefone"
+	from funcionario func
+	inner join trabalhar trb on trb.Funcionario_CPF = func.CPF
+    inner join cargo crg on crg.CBO = trb.Cargo_CBO
+    inner join telefone tel on tel.Funcionario_CPF = func.CPF
+		where trb.dataFim is null
+			group by func.cpf, crg.CBO
+				order by func.nome;
+                
+SELECT Funcionario_CPF, count(cpf) * 180 "auxCreche"
+	FROM dependente
+		where timestampdiff(year, dataNasc, now()) < 7
+			group by Funcionario_CPF;
+
+create view vAuxCreche as
+	SELECT Funcionario_CPF, count(cpf) * 180 "auxCreche"
+		FROM dependente
+			where timestampdiff(year, dataNasc, now()) < 7
+				group by Funcionario_CPF;
+                
+select * from vauxcreche;
+
+select func.nome "Funcionário", func.cpf "CPF", crg.nome "Cargo",
+	concat(func.cargaHoraria, 'h') "Carga Horária", func.chavePIX "Chave PIX",
+	concat("R$ ", format(coalesce(vac.auxCreche, 0), 2, 'de_DE')) "Auxílio Creche", -- 180 por filho menor que 7 anos
+    concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário",
+    group_concat(tel.numero separator ', ') "Telefone"
+	from funcionario func
+	inner join trabalhar trb on trb.Funcionario_CPF = func.CPF
+    inner join cargo crg on crg.CBO = trb.Cargo_CBO
+    inner join telefone tel on tel.Funcionario_CPF = func.CPF
+    left join vauxcreche vac on vac.Funcionario_CPF = func.CPF
+		where trb.dataFim is null
+			group by func.cpf, crg.CBO
+				order by func.nome;
+
+create view vRelatorioRH as
+	select func.nome "Funcionário", func.cpf "CPF", crg.nome "Cargo",
+		concat(func.cargaHoraria, 'h') "Carga Horária", func.chavePIX "Chave PIX",
+		concat("R$ ", format(coalesce(vac.auxCreche, 0), 2, 'de_DE')) "Auxílio Creche", -- 180 por filho menor que 7 anos
+		concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário",
+		group_concat(tel.numero separator ', ') "Telefone"
+		from funcionario func
+		inner join trabalhar trb on trb.Funcionario_CPF = func.CPF
+		inner join cargo crg on crg.CBO = trb.Cargo_CBO
+		inner join telefone tel on tel.Funcionario_CPF = func.CPF
+		left join vauxcreche vac on vac.Funcionario_CPF = func.CPF
+			where trb.dataFim is null
+				group by func.cpf, crg.CBO
+					order by func.nome;
+
+select * from vrelatoriorh
+	where `Salário` >= avg(`Salário`);
+    
+select avg(salario) from funcionario;
+
+select * from vrelatoriorh
+	where `Salário` >= (select avg(salario) from funcionario);
+
+select func.nome "Funcionário", func.cpf "CPF", crg.nome "Cargo",
+	concat(func.cargaHoraria, 'h') "Carga Horária", func.chavePIX "Chave PIX",
+	concat("R$ ", format(coalesce(vac.auxCreche, 0), 2, 'de_DE')) "Auxílio Creche", -- 180 por filho menor que 7 anos
+    concat("R$ ", format(func.salario, 2, 'de_DE')) "Salário",
+    group_concat(tel.numero separator ', ') "Telefone"
+	from funcionario func
+	inner join trabalhar trb on trb.Funcionario_CPF = func.CPF
+    inner join cargo crg on crg.CBO = trb.Cargo_CBO
+    inner join telefone tel on tel.Funcionario_CPF = func.CPF
+    left join vauxcreche vac on vac.Funcionario_CPF = func.CPF
+		where trb.dataFim is null and
+			func.salario >= (select avg(salario) from funcionario)
+			group by func.cpf, crg.CBO
+				order by func.nome;
+                
+
+
+
+
+
+
+
 
 
 

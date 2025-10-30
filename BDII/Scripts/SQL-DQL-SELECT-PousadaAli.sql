@@ -319,6 +319,25 @@ update funcionario,
 	set cargaHoraria = 36
 		where funcionario.cpf = crgFunc.cpf;
 
+select upper(func.nome) "Funcionário",
+	replace(replace(func.cpf, '.', ''), '-', '') "CPF",
+    func.chavePIX "Chave PIX",
+    concat(func.cargaHoraria, 'h') "Carga Horária",
+    case func.cargaHoraria when 36 then 22 * 15 * 2
+		else 22 * 15
+	end "Vale Alimentação"
+	from funcionario func
+		order by func.nome;
+
+
+
+
+
+
+
+
+
+
 -- 180 (<25), 280(25>=  and <35), 380 (35>=  and <45), 480 (45>=  and <55) depois 600
 
 

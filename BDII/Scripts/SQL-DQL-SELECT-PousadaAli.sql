@@ -311,7 +311,15 @@ select dep.nome "Departamento",
 			group by dep.idDepartamento
 				order by sum(func.salario) desc;
 
+update funcionario, 
+	(select func.cpf from funcionario func
+	inner join trabalhar trb on trb.Funcionario_CPF = func.cpf
+	inner join cargo crg on crg.CBO = trb.Cargo_CBO
+    where crg.nome like "Segurança%" or crg.nome like "Auxiliar%") as crgFunc
+	set cargaHoraria = 36
+		where funcionario.cpf = crgFunc.cpf;
 
+-- 180 (<25), 280(25>=  and <35), 380 (35>=  and <45), 480 (45>=  and <55) depois 600
 
 
 

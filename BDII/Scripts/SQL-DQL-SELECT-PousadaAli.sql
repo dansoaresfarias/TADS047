@@ -319,26 +319,69 @@ update funcionario,
 	set cargaHoraria = 36
 		where funcionario.cpf = crgFunc.cpf;
 
+-- 180 (<25), 280(25>=  and <35), 380 (35>=  and <45), 480 (45>=  and <55) depois 600
 select upper(func.nome) "Funcionário",
 	replace(replace(func.cpf, '.', ''), '-', '') "CPF",
     func.chavePIX "Chave PIX",
     concat(func.cargaHoraria, 'h') "Carga Horária",
     case func.cargaHoraria when 36 then 22 * 15 * 2
 		else 22 * 15
-	end "Vale Alimentação"
+	end "Vale Alimentação",
+    case when timestampdiff(year, func.dataNasc, now()) < 25 then 180
+		when timestampdiff(year, func.dataNasc, now()) between 24 and 34 then 280
+        when timestampdiff(year, func.dataNasc, now()) between 34 and 44 then 380
+        when timestampdiff(year, func.dataNasc, now()) between 44 and 54 then 480
+        else 600
+    end "Auxílio Saúde"
+	from funcionario func
+		order by func.nome;
+
+select avg(salario), round(avg(salario), 2), truncate(avg(salario), 2),
+	format(avg(salario), 2, 'de_DE')
+	from funcionario;
+
+select sysdate(), adddate(sysdate(), interval -7 minute);
+
+-- https://www.devmedia.com.br/pl-sql-functions-e-procedures/29882
+-- https://dev.mysql.com/doc/refman/8.4/en/create-procedure.html
+-- https://dev.mysql.com/doc/refman/8.4/en/if.html
+delimiter $$
+create function calcValeAlimentacao(ch int)
+	returns decimal(5,2) deterministic
+    begin
+		if (ch = 36)
+			then return 22 * 15 * 2;
+		else return 22 * 15;
+        end if;
+    end $$
+delimiter ;
+
+delimiter $$
+create function calcAuxSaude(dn date)
+	returns decimal(5,2) deterministic
+    begin
+		declare idade int;
+        select timestampdiff(year, dn, now()) into idade;
+        if (idade < 25) then return 180;
+			elseif (idade < 35) then return 280;
+            elseif (idade < 45) then return 380;
+            elseif (idade < 55) then return 480;
+            else return 600;
+		end if;
+    end $$
+delimiter ;
+
+select upper(func.nome) "Funcionário",
+	replace(replace(func.cpf, '.', ''), '-', '') "CPF",
+    func.chavePIX "Chave PIX",
+    concat(func.cargaHoraria, 'h') "Carga Horária",
+    concat("R$ ", format(calcValeAlimentacao(func.cargaHoraria), 2 , 'de_DE')) "Vale Alimentação",
+    concat("R$ ", format(calcAuxSaude(func.dataNasc), 2 , 'de_DE'))  "Auxílio Saúde"
 	from funcionario func
 		order by func.nome;
 
 
 
-
-
-
-
-
-
-
--- 180 (<25), 280(25>=  and <35), 380 (35>=  and <45), 480 (45>=  and <55) depois 600
 
 
 

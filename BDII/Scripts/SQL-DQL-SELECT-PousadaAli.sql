@@ -371,16 +371,97 @@ create function calcAuxSaude(dn date)
     end $$
 delimiter ;
 
+delimiter $$
+create function calcValeTransporte(pCPF varchar(14))
+	returns decimal(5,2) deterministic
+    begin
+		declare precoPassagem decimal(4,2) default 4.3;
+        declare pCidade varchar(45);
+        declare pSalario decimal(7,2);
+        declare vt decimal(5,2);
+        
+        select salario into pSalario
+			from funcionario
+				where cpf = pCPF;
+                
+		select cidade into pCidade
+			from endereco
+				where Funcionario_CPF = pCPF;
+		
+        if(pCidade = "Recife")
+			then set vt = 22 * 2 * precoPassagem;
+		else 
+			set vt = 22 * 4 * precoPassagem;
+		end if;
+        
+        set vt = vt - 0.06 * pSalario;
+        
+        if(vt < 0)
+			then return 0.0;
+		else
+			return vt;
+		end if;        
+    end $$
+delimiter ;
+
+SELECT * FROM vauxcreche;
+
+delimiter $$
+create function calcINSS(salario decimal(7,2))
+	returns decimal(6,2) deterministic
+    begin
+		if(salario <= 1518)
+			then return salario * 0.075;
+		elseif(salario > 1518 and salario <= 2793.88)
+			then return salario * 0.09;
+		elseif(salario > 2793.88 and salario <= 4190.83)
+			then return salario * 0.12;
+		elseif(salario > 4190.83 and salario <= 8157.41)
+			then return salario * 0.14;
+		else
+			return 8157.41 * 0.14;
+		end if;
+    end $$
+delimiter ;
+
+delimiter $$
+create function calcIRRF(salario decimal(7,2))
+	returns decimal(6,2) deterministic
+    begin
+		if(salario <= 2259.20)
+			then return 0.0;
+		elseif(salario > 2259.20 and salario <= 2826.65)
+			then return salario * 0.075;
+		elseif(salario > 2826.65 and salario <= 3751.05)
+			then return salario * 0.15;
+		elseif(salario > 3751.05 and salario <= 4664.68)
+			then return salario * 0.225;
+		else
+			return salario * 0.275;
+		end if;
+    end $$
+delimiter ;
+
 select upper(func.nome) "Funcionário",
 	replace(replace(func.cpf, '.', ''), '-', '') "CPF",
     func.chavePIX "Chave PIX",
     concat(func.cargaHoraria, 'h') "Carga Horária",
+    concat("R$ ", format(func.salario, 2 , 'de_DE')) "Salário Bruto",
     concat("R$ ", format(calcValeAlimentacao(func.cargaHoraria), 2 , 'de_DE')) 
 		"Vale Alimentação",
     concat("R$ ", format(calcAuxSaude(func.dataNasc), 2 , 'de_DE'))
-		"Auxílio Saúde"
+		"Auxílio Saúde",
+	concat("R$ ", format(calcValeTransporte(func.cpf), 2 , 'de_DE'))
+        "Vale Transporte",
+	concat("R$ ", format(coalesce(vac.auxCreche, 0), 2 , 'de_DE'))
+        "Auxílio Creche",
+	concat("-R$ ", format(calcINSS(func.salario), 2 , 'de_DE'))
+        "INSS",
+	concat("-R$ ", format(calcIRRF(func.salario), 2 , 'de_DE'))
+        "IRRF"
 	from funcionario func
-		order by func.nome;
+		left join vauxcreche vac on vac.Funcionario_CPF = func.cpf
+			order by func.nome;
 
 
 

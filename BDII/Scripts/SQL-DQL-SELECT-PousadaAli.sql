@@ -371,12 +371,49 @@ create function calcAuxSaude(dn date)
     end $$
 delimiter ;
 
+delimiter $$
+create function calcValeTransporte(pcpf varchar(14))
+	returns decimal(5,2) deterministic
+    begin
+		declare cid varchar(45);
+        declare sal decimal(7,2);
+        declare valorPassagem decimal(4,2) default 4.3;
+        declare valeTrans decimal(5,2);
+        
+        select cidade into cid
+			from endereco 
+				where Funcionario_CPF = pcpf;
+		
+		select salario into sal
+			from funcionario
+				where cpf = pcpf;
+                
+		if(cid = "Recife")
+			then set valeTrans = 22 * 2 * valorPassagem;
+		else
+			set valeTrans = 22 * 4 * valorPassagem;
+		end if;
+        
+        set valeTrans = valeTrans - 0.06 * sal;
+        
+        if(valeTrans < 0) 
+			then return 0;
+		else 
+			return valeTrans;
+		end if;
+    end $$
+delimiter ;
+
 select upper(func.nome) "Funcionário",
 	replace(replace(func.cpf, '.', ''), '-', '') "CPF",
     func.chavePIX "Chave PIX",
     concat(func.cargaHoraria, 'h') "Carga Horária",
-    concat("R$ ", format(calcValeAlimentacao(func.cargaHoraria), 2 , 'de_DE')) "Vale Alimentação",
-    concat("R$ ", format(calcAuxSaude(func.dataNasc), 2 , 'de_DE'))  "Auxílio Saúde"
+    concat("R$ ", format(calcValeAlimentacao(func.cargaHoraria), 2 , 'de_DE')) 
+		"Vale Alimentação",
+    concat("R$ ", format(calcAuxSaude(func.dataNasc), 2 , 'de_DE'))
+		"Auxílio Saúde",
+	concat("R$ ", format(calcValeTransporte(func.cpf), 2 , 'de_DE'))
+		"Vale Transporte"
 	from funcionario func
 		order by func.nome;
 

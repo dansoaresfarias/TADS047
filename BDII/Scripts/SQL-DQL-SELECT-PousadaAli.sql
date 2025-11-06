@@ -458,7 +458,12 @@ select upper(func.nome) "Funcionário",
 	concat("-R$ ", format(calcINSS(func.salario), 2 , 'de_DE'))
         "INSS",
 	concat("-R$ ", format(calcIRRF(func.salario), 2 , 'de_DE'))
-        "IRRF"
+        "IRRF",
+	concat("R$ ", format(func.salario + calcValeAlimentacao(func.cargaHoraria) +
+    calcAuxSaude(func.dataNasc) + calcValeTransporte(func.cpf) +
+    coalesce(vac.auxCreche, 0) - calcINSS(func.salario) -
+    calcIRRF(func.salario), 2 , 'de_DE'))
+		"Salário Líquido"
 	from funcionario func
 		left join vauxcreche vac on vac.Funcionario_CPF = func.cpf
 			order by func.nome;

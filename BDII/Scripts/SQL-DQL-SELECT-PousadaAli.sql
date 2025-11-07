@@ -468,12 +468,62 @@ select upper(func.nome) "Funcionário",
 		left join vauxcreche vac on vac.Funcionario_CPF = func.cpf
 			order by func.nome;
 
+delimiter $$
+create procedure cadFuncionario(in pCPF varchar(14),
+								in pnome varchar(60),
+								in pnomeSocial varchar(45),
+								in pdataNasc date,
+								in pgenero varchar(25),
+								in pestadoCivil varchar(25),
+								in pemail varchar(80),
+								in pcarteiraTrab varchar(45),
+								in pcargaHoraria int,
+								in psalario decimal(7,2),
+								in pchavePIX varchar(45),
+                                in pUF char(2),
+								in pcidade varchar(45),
+								in pbairro varchar(45),
+								in prua varchar(45),
+								in pnumero int,
+								in pcomp varchar(45),
+								in pcep varchar(9),
+                                in ptelefone1 varchar(15),
+                                in ptelefone2 varchar(15),
+                                in ptelefone3 varchar(15))
+	begin
+		insert into funcionario
+			value (pCPF, pnome, pnomeSocial, pdataNasc, pgenero, pestadoCivil, 
+            pemail, pcarteiraTrab, pcargaHoraria, psalario, pchavePIX, 
+            1, 0.0);
+		insert into endereco
+			value (pCPF, pUF, pcidade, pbairro, prua, pnumero, pcomp, pcep);
+		insert into telefone (numero, Funcionario_CPF)
+			value (ptelefone1, pCPF);
+		if(ptelefone2 is not null)
+			then insert into telefone (numero, Funcionario_CPF)
+					value (ptelefone2, pCPF);
+		end if;
+        if(ptelefone3 is not null)
+			then insert into telefone (numero, Funcionario_CPF)
+					value (ptelefone3, pCPF);
+		end if;
+    end $$
+delimiter ;
 
+desc endereco;
 
+call cadFuncionario("708.807.780-78", "Laís Nayara", null, '1990-05-15', 
+	"Outro", "Casada", "lais.nayara@gmail.com", "890789-00", 36, 3500,
+    "708.807.780-78", "PE", "Recife", "Linha do tiro", "Rua da bala", 171, 
+    "Casa B", "50171-171", "81988776677", "81977886655", null);
 
+select * from funcionario order by nome;
 
+select * from endereco;
 
+select * from telefone;
 
+delete from funcionario where cpf = "708.807.780-78";
 
 
 

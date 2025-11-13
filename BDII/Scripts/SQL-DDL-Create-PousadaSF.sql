@@ -433,6 +433,149 @@ CREATE TABLE IF NOT EXISTS `PousadaAlambique`.`FormaPag` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- 1. Remova o Procedure antigo, se ele existir
+-- -----------------------------------------------------
+DROP PROCEDURE IF EXISTS `PousadaAlambique`.`sp_gerar_hospedagem_completa`;
+
+-- -----------------------------------------------------
+-- 2. Mude o delimitador
+-- -----------------------------------------------------
+DELIMITER $$
+
+-- -----------------------------------------------------
+-- 3. Crie o novo Procedure Corrigido
+-- -----------------------------------------------------
+CREATE PROCEDURE `PousadaAlambique`.`sp_gerar_hospedagem_completa`(IN total_registros INT)
+BEGIN
+	-- -----------------------------------------------------
+	-- Declaração de Variáveis
+	-- -----------------------------------------------------
+	DECLARE i INT DEFAULT 0;
+	DECLARE v_id_reserva INT;
+	DECLARE v_cpf_func VARCHAR(14);
+	DECLARE v_doc_hospede VARCHAR(25);
+	DECLARE v_id_uh INT;
+	DECLARE v_valor_uh DECIMAL(7,2);
+	DECLARE v_data_inicio DATETIME;
+	DECLARE v_data_fim DATETIME;
+	DECLARE v_dias INT;
+	DECLARE v_valor_diarias DECIMAL(7,2) DEFAULT 0;
+	DECLARE v_valor_total DECIMAL(7,2) DEFAULT 0;
+	DECLARE v_valor_itens DECIMAL(7,2) DEFAULT 0;
+	DECLARE v_id_produto INT;
+	DECLARE v_valor_produto DECIMAL(5,2);
+	DECLARE v_qtd_produto INT;
+	DECLARE j INT;
+	DECLARE v_num_itens INT;
+
+	-- -----------------------------------------------------
+	-- Loop Principal (para gerar N hospedagens)
+	-- -----------------------------------------------------
+	WHILE i < total_registros DO
+	
+		-- 1. Resetar valores de cálculo
+		SET v_valor_diarias = 0;
+		SET v_valor_itens = 0;
+		SET v_valor_total = 0;
+
+		-- 2. Selecionar chaves estrangeiras aleatórias
+		SELECT CPF INTO v_cpf_func FROM Funcionario ORDER BY RAND() LIMIT 1;
+		SELECT docIdentificacao INTO v_doc_hospede FROM Hospede ORDER BY RAND() LIMIT 1;
+		SELECT idUH, valor INTO v_id_uh, v_valor_uh FROM UH ORDER BY RAND() LIMIT 1;
+
+		-- 3. Definir datas (diárias de 1 a 7 dias, no último ano)
+		SET v_dias = FLOOR(1 + RAND() * 7); 
+		SET v_data_inicio = DATE_SUB(NOW(), INTERVAL FLOOR(30 + RAND() * 365) DAY);
+		SET v_data_fim = DATE_ADD(v_data_inicio, INTERVAL v_dias DAY);
+		SET v_valor_diarias = (v_valor_uh * v_dias);
+
+		-- -----------------------------------------------------
+		-- 4. Criar a Reserva
+		-- -----------------------------------------------------
+		INSERT INTO Reserva (dataInicio, dataFim, qtdPessoas, status, Funcionario_CPF, Responsavel_docIdentificacao)
+		VALUES (v_data_inicio, v_data_fim, FLOOR(1 + RAND() * 2), 'Finalizada', v_cpf_func, v_doc_hospede);
+
+		-- 5. Obter o ID da Reserva que acabamos de criar
+		SET v_id_reserva = LAST_INSERT_ID();
+
+		-- -----------------------------------------------------
+		-- 6. Ligar a UH (quarto) à Reserva (N:M)
+		-- -----------------------------------------------------
+		INSERT INTO UH_Reserva (UH_idUH, Reserva_idReserva) VALUES (v_id_uh, v_id_reserva);
+
+		-- -----------------------------------------------------
+		-- 7. Criar a Hospedagem (Check-in) com valor PROVISÓRIO
+		-- (Este é o passo que foi movido e corrige o erro)
+		-- -----------------------------------------------------
+		INSERT INTO Hospedagem (Reserva_idReserva, checkIn, chekOut, valorTotal)
+		VALUES (v_id_reserva, 
+                DATE_ADD(v_data_inicio, INTERVAL FLOOR(RAND() * 60) MINUTE), 
+                DATE_SUB(v_data_fim, INTERVAL FLOOR(RAND() * 60) MINUTE),   
+                v_valor_diarias); -- Inserindo apenas o valor das diárias por enquanto
+
+		-- -----------------------------------------------------
+		-- 8. Adicionar Itens de Hospedagem (Consumo)
+		-- (Agora isso funciona, pois a Hospedagem (pai) já existe)
+		-- -----------------------------------------------------
+		SET j = 0;
+		SET v_num_itens = FLOOR(RAND() * 6); -- De 0 a 5 itens consumidos
+		
+		WHILE j < v_num_itens DO
+			SELECT idProduto, valor INTO v_id_produto, v_valor_produto FROM Produto ORDER BY RAND() LIMIT 1;
+			SET v_qtd_produto = FLOOR(1 + RAND() * 3); 
+			
+			INSERT INTO ItensHospedagem (Hospedagem_Reserva_idReserva, Produto_idProduto, qtd, valorUnd)
+			VALUES (v_id_reserva, v_id_produto, v_qtd_produto, v_valor_produto);
+			
+			SET v_valor_itens = v_valor_itens + (v_valor_produto * v_qtd_produto);
+			SET j = j + 1;
+		END WHILE;
+
+		-- -----------------------------------------------------
+		-- 9. Atualizar o Valor Total da Hospedagem
+		-- (Agora somamos os itens ao valor das diárias)
+		-- -----------------------------------------------------
+		SET v_valor_total = v_valor_diarias + v_valor_itens;
+		UPDATE Hospedagem SET valorTotal = v_valor_total WHERE Reserva_idReserva = v_id_reserva;
+        
+		-- -----------------------------------------------------
+		-- 10. Ligar Hóspede à Hospedagem (N:M)
+		-- -----------------------------------------------------
+		INSERT INTO Hospedar (Hospedagem_Reserva_idReserva, Hospede_docIdentificacao)
+		VALUES (v_id_reserva, v_doc_hospede);
+
+		-- -----------------------------------------------------
+		-- 11. Criar Forma de Pagamento
+		-- (Usa o v_valor_total que acabamos de atualizar)
+		-- -----------------------------------------------------
+		INSERT INTO FormaPag (tipo, valorPago, qtdParcelas, Hospedagem_Reserva_idReserva)
+		VALUES (
+			(SELECT ELT(1 + FLOOR(RAND() * 3), 'PIX', 'Cartão de Crédito', 'Cartão de Débito')),
+			v_valor_total, -- Valor final correto
+			(SELECT ELT(1 + FLOOR(RAND() * 3), 1, 1, 3)),
+			v_id_reserva
+		);
+
+		-- -----------------------------------------------------
+		-- 12. (Opcional) Adicionar uma Ocorrência aleatória 
+		-- -----------------------------------------------------
+		IF RAND() > 0.8 THEN 
+			INSERT INTO Ocorrencia (tipo, obs, valor, Hospedagem_Reserva_idReserva)
+			VALUES ('Observação', 'Dados gerados automaticamente.', NULL, v_id_reserva);
+		END IF;
+
+		SET i = i + 1;
+	END WHILE;
+
+	SELECT CONCAT(i, ' hospedagens completas geradas.') AS Resultado;
+	
+END$$
+
+-- -----------------------------------------------------
+-- 4. Retorne o delimitador ao padrão
+-- -----------------------------------------------------
+DELIMITER ;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -525,12 +525,88 @@ select * from telefone;
 
 delete from funcionario where cpf = "708.807.780-78";
 
+-- Proceduro de Check-In FODAAAAAA!!!
+delimiter $$
+create procedure realizarCheckin(in pidReserva int, 
+								in pdocIdentificacao varchar(25),
+								in pnome varchar(45),
+								in pgenero varchar(25),
+								in pdataNasc date,
+								in ptelefone varchar(15),
+								in pemail varchar(45),
+								in pResponsavel_docIdentificacao varchar(25))
+	begin
+		declare auxIdHospedagem int default 0;
+        declare auxIdHospede varchar(25) default null;
+        
+        select Reserva_idReserva into auxIdHospedagem 
+			from hospedagem 
+				where Reserva_idReserva = pidReserva;
+        if(auxIdHospedagem = 0)
+			then insert into hospedagem
+					value(pidReserva, now(), null, 0.0);
+				update reserva
+					set `status` = "Check-In"
+						where idReserva = pidReserva;
+		end if;
+		
+        select docIdentificacao into auxIdHospede
+			from hospede
+				where docIdentificacao = pdocIdentificacao;
+        if(auxIdHospede is null) 
+			then insert into hospede
+					value(pdocIdentificacao, pnome, pgenero, pdataNasc, 
+							ptelefone, pemail, pResponsavel_docIdentificacao);
+		end if;
+        
+        insert into hospedar
+			value(pidReserva, pdocIdentificacao);
+    end $$
+delimiter ;
+
+call realizarCheckin(332, "101.110.111-10" ,"Danielle Barbosa", "Feminino", 
+	'1995-10-08', "81982656582", "dani.dev.desenrolada@gmail.com", null);
+
+call realizarCheckin(332, "011.110.111-10" ,"Alex Barbosa", "Masculino", 
+	'1995-11-08', "81999656582", "alex.logista.desenrolada@gmail.com", null);
+
+delimiter $$
+create trigger tgr_aft_insert_itenshospedagem after insert
+	on itenshospedagem
+    for each row
+    begin
+		update produto
+			set quantidade = quantidade - new.qtd
+				where idProduto = new.Produto_idProduto;
+		update hospedagem
+			set valorTotal = valorTotal + new.qtd * new.valorUnd
+				where Reserva_idReserva = new.Hospedagem_Reserva_idReserva;            
+	end $$
+delimiter ;
+
+insert into itenshospedagem
+	values (332, 1, 2, 4.5), 
+			(332, 8, 10, 9),
+            (332, 15, 5, 6);
 
 
+delimiter $$
+create trigger tgr_bfr_insert_itenshospedagem before insert
+	on itenshospedagem
+    for each row
+    begin
+		declare auxQtdProd int;
+        select quantidade into auxQtdProd
+			from produto
+				where idProduto = new.Produto_idProduto;
+		if(new.qtd > auxQtdProd) 
+			then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Quantidade insuficiente para o consumo desse produto!';
+        end if;
+	end $$
+delimiter ;
 
-
-
-
-
-
+insert into itenshospedagem
+	values (332, 2, 2, 5), 
+			(332, 6, 400, 12),
+            (332, 10, 5, 8);
 
